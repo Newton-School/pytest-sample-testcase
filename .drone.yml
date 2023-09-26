@@ -1,0 +1,29 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: run-test-cases
+    image: python:3.9
+    when:
+      status:
+        - failure
+        - success
+    commands:
+      - pip install pytest
+      - git clone https://${GIT_ACCESS_TOKEN}@github.com/${GIT_REPO}.git
+      - cp -r tests/ ${PROJECT_FOLDER_NAME}
+      - cp -r utils/ ${PROJECT_FOLDER_NAME}
+      - cd ${PROJECT_FOLDER_NAME}
+      - python3 start.py
+      - env PROJECT_FOLDER_NAME=${PROJECT_FOLDER_NAME} pytest -v --junit-xml result.xml
+  - name: result
+    image: python:3.9
+    when:
+      status:
+        - failure
+        - success
+    depends_on:
+      - run-test-cases
+    commands:
+      - cd ${PROJECT_FOLDER_NAME}
+      - python3 utils/parser.py
