@@ -15,6 +15,7 @@ steps:
       - cp -r utils/ ${PROJECT_FOLDER_NAME}
       - cd ${PROJECT_FOLDER_NAME}
       - python3 start.py
+      - echo $NS_STATUS
       - env PROJECT_FOLDER_NAME=${PROJECT_FOLDER_NAME} pytest -v --junit-xml result.xml
   - name: result
     image: python:3.9
